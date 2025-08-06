@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebBanHangOnline.Data;
+using WebBanHangOnline.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,31 +16,33 @@ namespace WebBanHangOnline.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> List(string? searchString, int? categoryId)
+        public async Task<IActionResult> List(int? categoryId)
         {
-            // Lấy query cơ bản
-            var productsQuery = _context.Products.Include(p => p.Category).AsQueryable();
+            var query = _context.Products.Include(p => p.Category).AsQueryable();
 
-            // Lọc theo từ khóa tìm kiếm nếu có
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                productsQuery = productsQuery.Where(p => p.Name.Contains(searchString));
-            }
-
-            // Lọc theo danh mục nếu có
             if (categoryId.HasValue)
             {
-                productsQuery = productsQuery.Where(p => p.CategoryId == categoryId.Value);
+                query = query.Where(p => p.CategoryId == categoryId);
             }
 
-            var products = await productsQuery.ToListAsync();
+            var products = await query.ToListAsync();
+            var categories = await _context.Categories.ToListAsync();
 
-            // Gửi các giá trị lọc về View để hiển thị lại
-            ViewBag.Categories = await _context.Categories.ToListAsync();
-            ViewData["CurrentSearch"] = searchString;
-            ViewData["CurrentCategory"] = categoryId;
+            ViewBag.Categories = categories;
+            ViewBag.SelectedCategoryId = categoryId;
 
             return View(products);
+        }
+
+        // Action để hiển thị ảnh sản phẩm từ database
+        public async Task<IActionResult> GetImage(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product?.ImageData != null)
+            {
+                return File(product.ImageData, product.ImageContentType ?? "image/jpeg");
+            }
+            return NotFound();
         }
 
         public IActionResult Details(int id)

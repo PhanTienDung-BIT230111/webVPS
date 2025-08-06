@@ -32,7 +32,16 @@
                     <tr class="border-b border-gray-200 hover:bg-gray-50">
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-3">
-                                <img alt="@item.Name" class="w-12 h-12 rounded-md object-cover" src="@(string.IsNullOrEmpty(item.ImageUrl) ? "https://placehold.co/100x100/EFEFEF/AAAAAA?text=Ảnh" : item.ImageUrl)" />
+                                @if (item.ImageData != null)
+                                {
+                                    <img alt="@item.Name" class="w-12 h-12 rounded-md object-cover" 
+                                         src="@Url.Action("GetImage", "AdminProduct", new { id = item.Id, area = "Admin" })" />
+                                }
+                                else
+                                {
+                                    <img alt="@item.Name" class="w-12 h-12 rounded-md object-cover" 
+                                         src="/images/default-product.png" />
+                                }
                                 <div class="font-semibold text-gray-900">@item.Name</div>
                             </div>
                         </td>

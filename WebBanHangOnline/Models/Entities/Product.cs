@@ -20,6 +20,13 @@ namespace WebBanHangOnline.Models
         public decimal Price { get; set; }
 
         public string ImageUrl { get; set; }
+        
+        // Thêm trường để lưu ảnh dưới dạng byte array
+        public byte[] ImageData { get; set; }
+        
+        // Thêm trường để lưu loại MIME của ảnh
+        public string ImageContentType { get; set; }
+
         public int Stock { get; set; }
 
         [Required(ErrorMessage = "Danh mục là bắt buộc")]
